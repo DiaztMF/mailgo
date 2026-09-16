@@ -1,38 +1,74 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Mailgo
 
-## Getting Started
+Intelligent email marketing and campaign service landing page built with Next.js 15 (App Router), TypeScript, Drizzle ORM, and Supabase Postgres.
 
-First, run the development server:
+## Pages / Routes
+
+| Route | Page | Description |
+|---|---|---|
+| `/` | `app/page.tsx` | Main landing page featuring Hero, Features, VisualFeatures, Pricing, Subscriber counter, and FAQs |
+| `/login` | `app/login/page.tsx` | Static authentication showcase page |
+| `POST /api/seed` | `app/api/seed/route.ts` | Idempotent database seeding endpoint (POST only, GET 405) |
+
+## Project Structure
+
+```text
+app/
+├── api/seed/route.ts       # POST /api/seed — idempotent database seed endpoint
+├── login/
+│   └── page.tsx            # Static showcase login route
+├── layout.tsx              # Root layout with navbar and footer
+└── page.tsx                # Main landing page (ISR revalidate = 60)
+components/
+├── ui/                     # UI components (Hero, Features, VisualFeatures, Pricing, FAQs, CTA, etc.)
+├── ContactForm.tsx         # Interactive client contact form with feedback states
+├── SectionWrapper.jsx      # Section container wrapper
+└── GradientWrapper.jsx     # Gradient background wrapper
+src/
+├── actions/
+│   └── contact.ts          # Server Action for contact submission with Zod validation
+└── lib/
+    ├── db.ts               # Drizzle ORM client (search_path=mailgo, prepare=false)
+    ├── schema.ts           # PostgreSQL schema (campaigns, subscribers, contacts)
+    ├── queries.ts          # Queries for campaigns, subscriber stats, and contacts with fallbacks
+    ├── seed-data.ts        # Initial campaigns and subscribers demo data
+    └── seed.ts             # CLI seed script
+drizzle/                    # Drizzle generated SQL migrations
+public/                     # Static assets, SVG illustrations, and icons
+.github/workflows/
+└── ci.yml                  # GitHub Actions CI workflow (tsc + build)
+```
+
+## Tech Stack
+
+- **Next.js 15 (App Router)** — React 19 server components, ISR caching, and server actions
+- **React 19** — Foundation UI library
+- **TypeScript** — Strict type safety across schema, queries, and server actions
+- **Drizzle ORM & postgres-js** — Type-safe PostgreSQL client with Supabase transaction pooler support
+- **Tailwind CSS** — Utility-first responsive styling
+- **Zod** — Schema declaration and validation for contact submissions
+- **motion & framer-motion** — Micro-interactions and scroll-in-view transitions
+
+## Scripts
+
+| Script | Command | Description |
+|---|---|---|
+| Dev | `pnpm dev` | Start local development server on `localhost:3000` |
+| Build | `pnpm build` | Production build |
+| Start | `pnpm start` | Serve production build |
+| Lint | `pnpm lint` | Run ESLint |
+| DB Generate | `pnpm db:generate` | Generate SQL migrations from `src/lib/schema.ts` |
+| DB Migrate | `pnpm db:migrate` | Apply pending database migrations |
+| DB Seed | `pnpm db:seed` | Seed initial campaigns and subscribers (`tsx src/lib/seed.ts`) |
+
+## Quick Start
+
+Requires [Node.js](https://nodejs.org) and [pnpm](https://pnpm.io).
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
+pnpm build
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
-
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
-
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
