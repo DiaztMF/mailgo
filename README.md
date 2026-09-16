@@ -1,74 +1,94 @@
-# Mailgo
+# mailgo
 
-Intelligent email marketing and campaign service landing page built with Next.js 15 (App Router), TypeScript, Drizzle ORM, and Supabase Postgres.
+Intelligent email marketing and campaign service landing page built with Next.js App Router, TypeScript, Drizzle ORM, and Supabase Postgres.
 
-## Pages / Routes
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Next.js](https://img.shields.io/badge/Next.js-15-black)](https://nextjs.org/)
+[![Drizzle ORM](https://img.shields.io/badge/Drizzle-ORM-orange)](https://orm.drizzle.team/)
 
-| Route | Page | Description |
-|---|---|---|
-| `/` | `app/page.tsx` | Main landing page featuring Hero, Features, VisualFeatures, Pricing, Subscriber counter, and FAQs |
-| `/login` | `app/login/page.tsx` | Static authentication showcase page |
-| `POST /api/seed` | `app/api/seed/route.ts` | Idempotent database seeding endpoint (POST only, GET 405) |
+## Installation
 
-## Project Structure
-
-```text
-app/
-├── api/seed/route.ts       # POST /api/seed — idempotent database seed endpoint
-├── login/
-│   └── page.tsx            # Static showcase login route
-├── layout.tsx              # Root layout with navbar and footer
-└── page.tsx                # Main landing page (ISR revalidate = 60)
-components/
-├── ui/                     # UI components (Hero, Features, VisualFeatures, Pricing, FAQs, CTA, etc.)
-├── ContactForm.tsx         # Interactive client contact form with feedback states
-├── SectionWrapper.jsx      # Section container wrapper
-└── GradientWrapper.jsx     # Gradient background wrapper
-src/
-├── actions/
-│   └── contact.ts          # Server Action for contact submission with Zod validation
-└── lib/
-    ├── db.ts               # Drizzle ORM client (search_path=mailgo, prepare=false)
-    ├── schema.ts           # PostgreSQL schema (campaigns, subscribers, contacts)
-    ├── queries.ts          # Queries for campaigns, subscriber stats, and contacts with fallbacks
-    ├── seed-data.ts        # Initial campaigns and subscribers demo data
-    └── seed.ts             # CLI seed script
-drizzle/                    # Drizzle generated SQL migrations
-public/                     # Static assets, SVG illustrations, and icons
-.github/workflows/
-└── ci.yml                  # GitHub Actions CI workflow (tsc + build)
+```bash
+git clone https://github.com/DiaztMF/mailgo.git
+cd mailgo
+pnpm install
 ```
 
-## Tech Stack
-
-- **Next.js 15 (App Router)** — React 19 server components, ISR caching, and server actions
-- **React 19** — Foundation UI library
-- **TypeScript** — Strict type safety across schema, queries, and server actions
-- **Drizzle ORM & postgres-js** — Type-safe PostgreSQL client with Supabase transaction pooler support
-- **Tailwind CSS** — Utility-first responsive styling
-- **Zod** — Schema declaration and validation for contact submissions
-- **motion & framer-motion** — Micro-interactions and scroll-in-view transitions
-
-## Scripts
-
-| Script | Command | Description |
-|---|---|---|
-| Dev | `pnpm dev` | Start local development server on `localhost:3000` |
-| Build | `pnpm build` | Production build |
-| Start | `pnpm start` | Serve production build |
-| Lint | `pnpm lint` | Run ESLint |
-| DB Generate | `pnpm db:generate` | Generate SQL migrations from `src/lib/schema.ts` |
-| DB Migrate | `pnpm db:migrate` | Apply pending database migrations |
-| DB Seed | `pnpm db:seed` | Seed initial campaigns and subscribers (`tsx src/lib/seed.ts`) |
+TypeScript types are included out of the box.
 
 ## Quick Start
 
-Requires [Node.js](https://nodejs.org) and [pnpm](https://pnpm.io).
+1. Configure `.env.local`:
 
 ```bash
-pnpm install
-pnpm build
+DATABASE_URL="postgresql://postgres.[REF]:[PASSWORD]@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres"
+```
+
+2. Run development server:
+
+```bash
 pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## What is mailgo?
+
+`mailgo` is an email marketing platform landing page demonstrating high-conversion product showcases, dynamic campaign tier pricing, live audience counter statistics, and direct customer outreach workflows.
+
+## Why mailgo?
+
+Marketing sites often suffer from static counters and hardcoded pricing that require constant code deployments. `mailgo` provides:
+
+- **Live Counter & Campaign Feeds**: Renders subscriber numbers and tiers queried directly from the `mailgo` PostgreSQL schema.
+- **Micro-Interaction Polish**: Combines modern animations with accessible forms and feedback states.
+- **Incremental Static Regeneration**: Employs `revalidate = 60` for ultra-fast TTFB and fresh content.
+
+## Routes & API
+
+### Pages
+
+| Route | Type | Description |
+|---|---|---|
+| `/` | ISR (60s) | Main product showcase, animated features, pricing, and contact form |
+| `/login` | Static | Visual authentication showcase page |
+
+### Endpoints & Server Actions
+
+#### `POST /api/seed`
+Idempotent route handler that seeds initial campaigns and dummy subscribers into `mailgo` tables.
+
+- **Response:** `{ ok: boolean, campaigns?: number, subscribers?: number, skipped?: boolean }`
+
+#### `submitContact(prevState, formData)`
+Server Action located in `src/actions/contact.ts` processing client contact messages.
+
+| Field | Type | Validation |
+|---|---|---|
+| `name` | `string` | Minimum 2 characters |
+| `email` | `string` | Valid email address |
+| `message` | `string` | Minimum 5 characters |
+
+## Examples
+
+### Fetching Campaign Plans
+
+```typescript
+import { getCampaigns, getSubscribersCount } from "@/src/lib/queries";
+
+// Fetch campaign pricing options and aggregate subscribers count
+const [campaigns, count] = await Promise.all([
+  getCampaigns(),
+  getSubscribersCount(),
+]);
+```
+
+## Architecture & Development Guides
+
+For deeper technical context and conventions:
+
+- **[AGENTS.md](./AGENTS.md)** — Architectural conventions, multi-schema requirements, and verification guidelines.
+
+## License
+
+MIT - see [LICENSE](./LICENSE) for details.
