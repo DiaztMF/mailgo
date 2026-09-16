@@ -8,6 +8,9 @@
 # testing
 /coverage
 
+# typescript
+tsconfig.tsbuildinfo
+
 # next.js
 /.next/
 /out/
@@ -32,3 +35,6 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+.vercel
+.env*
